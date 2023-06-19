@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.thomazcm.financeira.api.dto.UserDto;
 import com.thomazcm.financeira.api.form.LoginForm;
-import com.thomazcm.financeira.config.CookieService;
-import com.thomazcm.financeira.config.JwtService;
+import com.thomazcm.financeira.config.service.CookieService;
+import com.thomazcm.financeira.config.service.JwtService;
 import com.thomazcm.financeira.model.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,7 +45,7 @@ public class LoginApi {
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             User user = (User) authentication.getPrincipal();
             addCookieWithTokenToResponse(user, response);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(new UserDto(user));
         } catch (AuthenticationException | ClassCastException e) {
             logger.error("authentication failed for user " + form.getEmail()
             + System.lineSeparator() + e.getMessage());

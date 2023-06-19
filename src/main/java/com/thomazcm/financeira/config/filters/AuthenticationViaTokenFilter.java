@@ -1,9 +1,11 @@
-package com.thomazcm.financeira.config;
+package com.thomazcm.financeira.config.filters;
 
 import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.thomazcm.financeira.config.service.CookieService;
+import com.thomazcm.financeira.config.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

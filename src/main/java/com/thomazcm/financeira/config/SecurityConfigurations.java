@@ -10,6 +10,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.thomazcm.financeira.config.filters.AuthenticationViaTokenFilter;
+import com.thomazcm.financeira.config.service.AuthenticationService;
+import com.thomazcm.financeira.config.service.CookieService;
+import com.thomazcm.financeira.config.service.JwtService;
 
 @Configuration
 @EnableWebSecurity

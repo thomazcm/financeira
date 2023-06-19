@@ -1,4 +1,4 @@
-package com.thomazcm.financeira.config;
+package com.thomazcm.financeira.config.service;
 
 import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
