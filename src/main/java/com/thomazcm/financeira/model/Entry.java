@@ -36,6 +36,10 @@ public abstract class Entry {
         this.date = date;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
     public User getUser() {
         return this.user;
     }

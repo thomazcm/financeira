@@ -24,7 +24,7 @@ public class UserIdentifierHelper {
         
     }
 
-    public Long getIdFromRequest(HttpServletRequest request) {
+    public Long getUserIdFromRequest(HttpServletRequest request) {
         String jwtToken = getTokenFromRequest(request);
         return jwtService.getIdFromToken(jwtToken);
     }
