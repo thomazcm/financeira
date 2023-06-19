@@ -53,13 +53,12 @@ public class EntryService<T extends Entry> {
         }
     }
 
-    public T updateEntry(T entry, T updatedEntry, EntryRepository<T> repository) {
-        entry.setName(updatedEntry.getName() == null ? entry.getName() : updatedEntry.getName());
-        entry.setValue(
-                updatedEntry.getValue() == null ? entry.getValue() : updatedEntry.getValue());
-        entry.setDate(updatedEntry.getDate() == null ? entry.getDate() : updatedEntry.getDate());
+    public T updateEntry(T entry, T newValues, EntryRepository<T> repository) {
+        entry.setName(newValues.getName() == null ? entry.getName() : newValues.getName());
+        entry.setValue(newValues.getValue() == null ? entry.getValue() : newValues.getValue());
+        entry.setDate(newValues.getDate() == null ? entry.getDate() : newValues.getDate());
         if (entry instanceof Expense) {
-            updateCategory(entry, updatedEntry);
+            updateCategory(entry, newValues);
         }
         return repository.save(entry);
     }

@@ -46,7 +46,7 @@ public class IncomeEndpoint {
     }
 
 
-    @PutMapping("/${id}")
+    @PutMapping("/{id}")
     public ResponseEntity<IncomeDto> updateIncome(HttpServletRequest request,
             @RequestBody IncomeForm form, @PathVariable int id) {
 
