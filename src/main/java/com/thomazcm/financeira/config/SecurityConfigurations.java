@@ -33,8 +33,11 @@ public class SecurityConfigurations {
     @SuppressWarnings("removal")
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/hello/**", "/user/**",
-                "/auth/**", "/logout/**", "/js/**", "/css/**").permitAll()).csrf().disable()
+        http.authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers("/user/**", "/auth/**", "/logout/**", "/js/**", "/css/**")
+                .permitAll()).authorizeHttpRequests(authorize -> {
+                    authorize.anyRequest().authenticated();
+                }).csrf().disable()
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                                 .invalidSessionUrl("/login"))

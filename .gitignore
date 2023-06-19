@@ -70,6 +70,7 @@ dist/
 local.properties
 .loadpath
 rebel.xml
+stack.txt
 
 # Ignore application configuration files that may contain sensitive data
 src/main/resources/application-local.properties

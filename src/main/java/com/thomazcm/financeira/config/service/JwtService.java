@@ -43,8 +43,7 @@ public class JwtService {
     }
 
     public User getUserFromToken(String jwtToken) {
-        Long id = Long.parseLong(getClaims(jwtToken).getSubject());
-        return repository.findById(id).orElse(null);
+        return repository.findById(getIdFromToken(jwtToken)).orElse(null);
     }
 
     public boolean isTokenExpiring(String jwtToken) {
@@ -56,6 +55,7 @@ public class JwtService {
 
     public String createToken(User user) {
         Date today = new Date();
+        TimeUnit.MILLISECONDS.toMinutes(Long.parseLong(expiration));
         Date tokenExpiration = new Date(today.getTime() + Long.parseLong(expiration) * 60 * 1000);
         String jwtToken = Jwts.builder().setIssuer("financeira").setSubject(user.getId().toString())
                 .setIssuedAt(today).setExpiration(tokenExpiration)
@@ -65,6 +65,11 @@ public class JwtService {
 
     private Claims getClaims(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    }
+
+    public Long getIdFromToken(String jwtToken) {
+        Long id = Long.parseLong(getClaims(jwtToken).getSubject());
+        return id;
     }
 
 }

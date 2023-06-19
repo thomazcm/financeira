@@ -1,11 +1,14 @@
 package com.thomazcm.financeira.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Profile implements GrantedAuthority, Serializable {
@@ -15,6 +18,14 @@ public class Profile implements GrantedAuthority, Serializable {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+    
+    @ManyToMany(mappedBy = "profiles")
+    private Set<User> users = new HashSet<>();
+    
+    public void addUser(User user) {
+        users.add(user);
+    }
+    
     
     @Override
     public String getAuthority() {
@@ -32,6 +43,8 @@ public class Profile implements GrantedAuthority, Serializable {
     public Long getId() {
         return this.id;
     }
+
+    
     
 
 }

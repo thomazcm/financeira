@@ -30,7 +30,7 @@ public class CookieService {
         Cookie jwtCookie = new Cookie("JWT-TOKEN", jwtToken);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(Integer.parseInt(expiration)*3600);
+        jwtCookie.setMaxAge(Integer.parseInt(expiration)*60);
         if (!"local".equals(activeProfile)) {
             jwtCookie.setSecure(true);
         }
