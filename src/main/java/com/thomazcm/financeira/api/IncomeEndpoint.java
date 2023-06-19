@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.thomazcm.financeira.api.dto.IncomeDto;
 import com.thomazcm.financeira.api.form.IncomeForm;
+import com.thomazcm.financeira.api.form.UpdateObject;
+import com.thomazcm.financeira.api.service.EntryHelper;
 import com.thomazcm.financeira.api.service.EntryService;
 import com.thomazcm.financeira.model.Income;
 import com.thomazcm.financeira.repository.IncomeRepository;
@@ -23,18 +25,39 @@ public class IncomeEndpoint {
 
     private final EntryService<Income> service;
     private final IncomeRepository repository;
+    private final EntryHelper helper;
     private final String CREATED_URI = "/receitas/{id}";
 
-    public IncomeEndpoint(EntryService<Income> service, IncomeRepository repository) {
+    public IncomeEndpoint(EntryService<Income> service, IncomeRepository repository,
+            EntryHelper helper) {
         this.service = service;
         this.repository = repository;
+        this.helper = helper;
     }
 
     @GetMapping
     public ResponseEntity<List<IncomeDto>> listAllIncome(HttpServletRequest request) {
 
-        var incomeList = service.findAllFromUser(request, repository);
+        var incomeList = service.findAll(request, repository);
         return ResponseEntity.ok(IncomeDto.toList(incomeList));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<IncomeDto> findIncomeFromId(HttpServletRequest request,
+            @PathVariable int id) {
+
+        Income income = service.findById(id, request, repository);
+
+        return income != null ? ResponseEntity.ok(new IncomeDto(income))
+                : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{year}/{month}")
+    public ResponseEntity<List<IncomeDto>> listIncomeByMonth(HttpServletRequest request,
+            @PathVariable int year, @PathVariable int month) {
+        List<Income> incomeFromMonthList = service.listByMonth(year, month, request, repository);
+
+        return ResponseEntity.ok(IncomeDto.toList(incomeFromMonthList));
     }
 
     @PostMapping
@@ -42,7 +65,7 @@ public class IncomeEndpoint {
             @RequestBody IncomeForm form) {
 
         var income = service.saveEntry(form.toIncome(), request, repository);
-        return service.created(CREATED_URI, income.getId()).body(new IncomeDto(income));
+        return helper.created(CREATED_URI, income.getId()).body(new IncomeDto(income));
     }
 
 
@@ -54,8 +77,10 @@ public class IncomeEndpoint {
         if (income == null) {
             return ResponseEntity.notFound().build();
         }
-        income = service.updateEntry(income, form.toIncome(), repository);
-        return ResponseEntity.ok(new IncomeDto(income));
+        if (service.updateEntry(income, form.toUpdateObject(), repository)) {
+            return ResponseEntity.ok(new IncomeDto(income));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")

@@ -1,14 +1,13 @@
 package com.thomazcm.financeira.api.service;
 
-import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
+import com.thomazcm.financeira.api.form.UpdateObject;
 import com.thomazcm.financeira.model.Entry;
-import com.thomazcm.financeira.model.Expense;
 import com.thomazcm.financeira.model.User;
 import com.thomazcm.financeira.repository.EntryRepository;
 import com.thomazcm.financeira.repository.UserRepository;
@@ -16,6 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class EntryService<T extends Entry> {
+    
+    private static final Logger logger = LoggerFactory.getLogger(EntryService.class);
 
     private UserIdentifierHelper helper;
     private UserRepository userRepository;
@@ -25,10 +26,9 @@ public class EntryService<T extends Entry> {
         this.userRepository = userRepository;
     }
 
-    public List<T> findAllFromUser(HttpServletRequest request, EntryRepository<T> repository) {
+    public List<T> findAll(HttpServletRequest request, EntryRepository<T> repository) {
         Long userId = helper.getUserIdFromRequest(request);
-        List<T> entries = repository.findByUser_Id(userId);
-        return entries;
+        return repository.findByUser_Id(userId);
     }
 
     public T saveEntry(T entry, HttpServletRequest request, EntryRepository<T> repository) {
@@ -53,23 +53,21 @@ public class EntryService<T extends Entry> {
         }
     }
 
-    public T updateEntry(T entry, T newValues, EntryRepository<T> repository) {
-        entry.setName(newValues.getName() == null ? entry.getName() : newValues.getName());
-        entry.setValue(newValues.getValue() == null ? entry.getValue() : newValues.getValue());
-        entry.setDate(newValues.getDate() == null ? entry.getDate() : newValues.getDate());
-        if (entry instanceof Expense) {
-            updateCategory(entry, newValues);
+    public boolean updateEntry(T entry, UpdateObject update, EntryRepository<T> repository) {
+        try {
+            update.updateEntry(entry);
+        } catch (Exception e) {
+            logger.error("Error updating Entry records", e);
+            return false;
         }
-        return repository.save(entry);
+        return repository.save(entry) != null;
     }
 
-    private void updateCategory(T entry, T updatedEntry) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public BodyBuilder created(String path, Long id) {
-        URI uri = UriComponentsBuilder.fromPath(path).buildAndExpand(id).toUri();
-        return ResponseEntity.created(uri);
+    public List<T> listByMonth(int year, int month, HttpServletRequest request,
+            EntryRepository<T> repository) {
+        Long userId = helper.getUserIdFromRequest(request);
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1);
+        return repository.findByUser_IdAndDateBetween(userId, startDate, endDate);
     }
 }
