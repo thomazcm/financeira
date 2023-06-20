@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
-public class EntryHelper {
+public class EntryEndpointHelper {
 
     public BodyBuilder created(String path, Long id) {
         URI uri = UriComponentsBuilder.fromPath(path).buildAndExpand(id).toUri();

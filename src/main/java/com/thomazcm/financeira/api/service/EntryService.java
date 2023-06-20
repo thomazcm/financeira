@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class EntryService<T extends Entry> {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(EntryService.class);
 
     private UserIdentifierHelper helper;
@@ -26,12 +26,13 @@ public class EntryService<T extends Entry> {
         this.userRepository = userRepository;
     }
 
-    public List<T> findAll(HttpServletRequest request, EntryRepository<T> repository) {
+    public List<T> findAllEntries(HttpServletRequest request, EntryRepository<T> repository) {
         Long userId = helper.getUserIdFromRequest(request);
         return repository.findByUser_Id(userId);
     }
 
-    public List<T> findByName(String name, HttpServletRequest request, EntryRepository<T> repository) {
+    public List<T> findEntryByName(String name, HttpServletRequest request,
+            EntryRepository<T> repository) {
         Long userId = helper.getUserIdFromRequest(request);
         return repository.findByUser_IdAndName(userId, name);
     }
@@ -43,16 +44,18 @@ public class EntryService<T extends Entry> {
         return entry;
     }
 
-    public T findById(int id, HttpServletRequest request, EntryRepository<T> repository) {
+    public T findEntryById(Long id, HttpServletRequest request, EntryRepository<T> repository) {
         Long userId = helper.getUserIdFromRequest(request);
-        Optional<T> incomeOptional = repository.findByIdAndUserId(Long.valueOf(id), userId);
+        Optional<T> incomeOptional = repository.findByIdAndUserId(id, userId);
         return incomeOptional.orElse(null);
     }
 
-    public boolean deleteById(int id, HttpServletRequest request, EntryRepository<T> repository) {
-        Long entryId = Long.valueOf(id);
-        if (repository.existsById(entryId)) {
-            repository.deleteById(entryId);
+    public boolean deleteEntryById(Long entryId, HttpServletRequest request,
+            EntryRepository<T> repository) {
+        Long userId = helper.getUserIdFromRequest(request);
+        Optional<T> entryOptional = repository.findByIdAndUserId(entryId, userId);
+        if (entryOptional.isPresent()) {
+            repository.delete(entryOptional.get());
             return true;
         } else {
             return false;
@@ -69,7 +72,7 @@ public class EntryService<T extends Entry> {
         return repository.save(entry) != null;
     }
 
-    public List<T> listByMonth(int year, int month, HttpServletRequest request,
+    public List<T> listEntriesFromMonth(int year, int month, HttpServletRequest request,
             EntryRepository<T> repository) {
         Long userId = helper.getUserIdFromRequest(request);
         LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);

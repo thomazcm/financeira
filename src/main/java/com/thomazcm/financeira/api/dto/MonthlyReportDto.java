@@ -2,51 +2,39 @@ package com.thomazcm.financeira.api.dto;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
-import java.util.Map;
 import com.thomazcm.financeira.model.ExpenseCategory;
 
 public class MonthlyReportDto {
     
-    private Double incomeTotal;
-    private Double expenseTotal;
-    private Double monthlyBalance;
-    private EnumMap<ExpenseCategory, Double> categoryExpenses;
+    private BigDecimal incomeTotal;
+    private BigDecimal expenseTotal;
+    private BigDecimal monthlyBalance;
+    private EnumMap<ExpenseCategory, BigDecimal> categoryExpenses;
 
-    public MonthlyReportDto(BigDecimal incomeSum, BigDecimal expenseSum,
+    public MonthlyReportDto(BigDecimal incomeSum, BigDecimal expenseSum, BigDecimal monthlyBalance,
             EnumMap<ExpenseCategory, BigDecimal> categoryExpenses) {
         
-        this.incomeTotal = incomeSum.doubleValue();
-        this.expenseTotal = expenseSum.doubleValue();
-        this.monthlyBalance = incomeSum.subtract(expenseSum).doubleValue();
-        this.categoryExpenses = mapToDouble(categoryExpenses);
+        this.incomeTotal = incomeSum;
+        this.expenseTotal = expenseSum;
+        this.monthlyBalance = monthlyBalance;
+        this.categoryExpenses = categoryExpenses;
         
     }
 
-    private EnumMap<ExpenseCategory, Double> mapToDouble(
-            EnumMap<ExpenseCategory, BigDecimal> categoryExpenses) {
-        EnumMap<ExpenseCategory, Double> doubleMap = new EnumMap<>(ExpenseCategory.class);
-        for (Map.Entry<ExpenseCategory, BigDecimal> entry : categoryExpenses.entrySet()) {
-            doubleMap.put(entry.getKey(), entry.getValue().doubleValue());
-        }
-        return doubleMap;
-    }
-
-    public Double getIncomeTotal() {
+    public BigDecimal getIncomeTotal() {
         return this.incomeTotal;
     }
 
-    public Double getExpenseTotal() {
+    public BigDecimal getExpenseTotal() {
         return this.expenseTotal;
     }
 
-    public Double getMonthlyBalance() {
+    public BigDecimal getMonthlyBalance() {
         return this.monthlyBalance;
     }
 
-    public EnumMap<ExpenseCategory, Double> getCategoryExpenses() {
+    public EnumMap<ExpenseCategory, BigDecimal> getCategoryExpenses() {
         return this.categoryExpenses;
     }
-    
-    
 
 }

@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.thomazcm.financeira.api.dto.IncomeDto;
 import com.thomazcm.financeira.api.form.IncomeForm;
-import com.thomazcm.financeira.api.service.EntryHelper;
+import com.thomazcm.financeira.api.form.UpdateObject;
+import com.thomazcm.financeira.api.service.EntryEndpointHelper;
 import com.thomazcm.financeira.api.service.EntryService;
 import com.thomazcm.financeira.model.Income;
 import com.thomazcm.financeira.repository.IncomeRepository;
@@ -25,11 +26,11 @@ public class IncomeEndpoint {
 
     private final EntryService<Income> service;
     private final IncomeRepository repository;
-    private final EntryHelper helper;
+    private final EntryEndpointHelper helper;
     private final String CREATED_URI = "/receitas/{id}";
 
     public IncomeEndpoint(EntryService<Income> service, IncomeRepository repository,
-            EntryHelper helper) {
+            EntryEndpointHelper helper) {
         this.service = service;
         this.repository = repository;
         this.helper = helper;
@@ -39,16 +40,16 @@ public class IncomeEndpoint {
     public ResponseEntity<List<IncomeDto>> listIncome(HttpServletRequest request,
             @RequestParam(required = false) String name) {
 
-        var incomeList = name == null ? service.findAll(request, repository)
-                : service.findByName(name, request, repository);
+        var incomeList = name == null ? service.findAllEntries(request, repository)
+                : service.findEntryByName(name, request, repository);
         return ResponseEntity.ok(IncomeDto.toList(incomeList));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<IncomeDto> findIncomeFromId(HttpServletRequest request,
-            @PathVariable int id) {
+            @PathVariable Long id) {
 
-        Income income = service.findById(id, request, repository);
+        Income income = service.findEntryById(id, request, repository);
 
         return income != null ? ResponseEntity.ok(new IncomeDto(income))
                 : ResponseEntity.notFound().build();
@@ -57,7 +58,8 @@ public class IncomeEndpoint {
     @GetMapping("/{year}/{month}")
     public ResponseEntity<List<IncomeDto>> listIncomeByMonth(HttpServletRequest request,
             @PathVariable int year, @PathVariable int month) {
-        List<Income> allIncomeFromMonth = service.listByMonth(year, month, request, repository);
+        List<Income> allIncomeFromMonth =
+                service.listEntriesFromMonth(year, month, request, repository);
 
         return ResponseEntity.ok(IncomeDto.toList(allIncomeFromMonth));
     }
@@ -73,21 +75,21 @@ public class IncomeEndpoint {
 
     @PutMapping("/{id}")
     public ResponseEntity<IncomeDto> updateIncome(HttpServletRequest request,
-            @RequestBody IncomeForm form, @PathVariable int id) {
+            @RequestBody IncomeForm form, @PathVariable Long id) {
 
-        Income income = service.findById(id, request, repository);
+        Income income = service.findEntryById(id, request, repository);
         if (income == null) {
             return ResponseEntity.notFound().build();
         }
-        if (service.updateEntry(income, form.toUpdateObject(), repository)) {
+        if (service.updateEntry(income, new UpdateObject(form), repository)) {
             return ResponseEntity.ok(new IncomeDto(income));
         }
         return ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteIncome(HttpServletRequest request, @PathVariable int id) {
-        if (service.deleteById(id, request, repository)) {
+    public ResponseEntity<?> deleteIncome(HttpServletRequest request, @PathVariable Long id) {
+        if (service.deleteEntryById(id, request, repository)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

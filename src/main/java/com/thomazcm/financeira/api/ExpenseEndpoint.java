@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.thomazcm.financeira.api.dto.ExpenseDto;
 import com.thomazcm.financeira.api.form.ExpenseForm;
-import com.thomazcm.financeira.api.service.EntryHelper;
+import com.thomazcm.financeira.api.form.UpdateObject;
+import com.thomazcm.financeira.api.service.EntryEndpointHelper;
 import com.thomazcm.financeira.api.service.EntryService;
 import com.thomazcm.financeira.model.Expense;
 import com.thomazcm.financeira.repository.ExpenseRepository;
@@ -25,11 +26,11 @@ public class ExpenseEndpoint {
 
     private final EntryService<Expense> service;
     private final ExpenseRepository repository;
-    private final EntryHelper helper;
+    private final EntryEndpointHelper helper;
     private final String CREATED_URI = "/despesas/{id}";
 
     public ExpenseEndpoint(EntryService<Expense> service, ExpenseRepository repository,
-            EntryHelper helper) {
+            EntryEndpointHelper helper) {
         this.service = service;
         this.repository = repository;
         this.helper = helper;
@@ -39,16 +40,16 @@ public class ExpenseEndpoint {
     public ResponseEntity<List<ExpenseDto>> listExpense(HttpServletRequest request,
             @RequestParam(required = false) String name) {
 
-        var expenseList = name == null ? service.findAll(request, repository)
-                : service.findByName(name, request, repository);
+        var expenseList = name == null ? service.findAllEntries(request, repository)
+                : service.findEntryByName(name, request, repository);
 
         return ResponseEntity.ok(ExpenseDto.toList(expenseList));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseDto> findExpenseFromId(HttpServletRequest request,
-            @PathVariable int id) {
-        var expense = service.findById(id, request, repository);
+            @PathVariable Long id) {
+        var expense = service.findEntryById(id, request, repository);
         return expense == null ? ResponseEntity.notFound().build()
                 : ResponseEntity.ok(new ExpenseDto(expense));
     }
@@ -57,7 +58,7 @@ public class ExpenseEndpoint {
     public ResponseEntity<List<ExpenseDto>> listExpenseByMonth(HttpServletRequest request,
             @PathVariable int year, @PathVariable int month) {
 
-        List<Expense> allExpenseFromMonth = service.listByMonth(year, month, request, repository);
+        List<Expense> allExpenseFromMonth = service.listEntriesFromMonth(year, month, request, repository);
         return ResponseEntity.ok(ExpenseDto.toList(allExpenseFromMonth));
     }
 
@@ -71,13 +72,13 @@ public class ExpenseEndpoint {
 
     @PutMapping("/{id}")
     public ResponseEntity<ExpenseDto> updateExpense(HttpServletRequest request,
-            @RequestBody ExpenseForm form, @PathVariable int id) {
+            @RequestBody ExpenseForm form, @PathVariable Long id) {
 
-        var expense = service.findById(id, request, repository);
+        var expense = service.findEntryById(id, request, repository);
         if (expense == null) {
             return ResponseEntity.notFound().build();
         }
-        if (service.updateEntry(expense, form.toUpdateObject(), repository)) {
+        if (service.updateEntry(expense, new UpdateObject(form), repository)) {
             return ResponseEntity.ok(new ExpenseDto(expense));
         }
         return ResponseEntity.badRequest().build();
@@ -85,8 +86,8 @@ public class ExpenseEndpoint {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteExpense(HttpServletRequest request, @PathVariable int id) {
-        if (service.deleteById(id, request, repository)) {
+    public ResponseEntity<?> deleteExpense(HttpServletRequest request, @PathVariable Long id) {
+        if (service.deleteEntryById(id, request, repository)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

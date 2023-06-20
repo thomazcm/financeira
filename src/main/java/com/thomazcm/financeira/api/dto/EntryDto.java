@@ -6,17 +6,17 @@ public class EntryDto {
 
     private String name;
     private Double value;
-    private Integer dia;
-    private Integer mes;
-    private Integer ano;
+    private int year;
+    private int month;
+    private int day;
 
 
     public EntryDto(Entry entry) {
         this.name = entry.getName();
         this.value = entry.getValue().doubleValue();
-        this.dia = entry.getDate().getDayOfMonth();
-        this.mes = entry.getDate().getMonthValue();
-        this.ano = entry.getDate().getDayOfYear();
+        this.day = entry.getDate().getDayOfMonth();
+        this.month = entry.getDate().getMonthValue();
+        this.year = entry.getDate().getYear();
     }
 
     public String getName() {
@@ -27,18 +27,16 @@ public class EntryDto {
         return this.value;
     }
 
-    public Integer getDia() {
-        return this.dia;
+    public int getYear() {
+        return this.year;
     }
 
-    public Integer getMes() {
-        return this.mes;
+    public int getMonth() {
+        return this.month;
     }
 
-    public Integer getAno() {
-        return this.ano;
+    public int getDay() {
+        return this.day;
     }
-
-
 
 }

@@ -28,21 +28,24 @@ public class MonthlyReportEndpoint {
 
 
     public MonthlyReportEndpoint(EntryService<Income> incomeService,
-            EntryService<Expense> expenseService, IncomeRepository incomeRepository, ReportHelper helper) {
+            EntryService<Expense> expenseService, IncomeRepository incomeRepository,
+            ReportHelper helper, ExpenseRepository expenseRepository) {
         this.incomeService = incomeService;
         this.expenseService = expenseService;
         this.incomeRepository = incomeRepository;
-        this.expenseRepository = null;
+        this.expenseRepository = expenseRepository;
         this.helper = helper;
     }
 
     @GetMapping("/{year}/{month}")
     public ResponseEntity<MonthlyReportDto> getMonthlyReport(HttpServletRequest request,
             @PathVariable int year, @PathVariable int month) {
-        List<Income> monthlyIncome = incomeService.listByMonth(year, month, request, incomeRepository);
-        List<Expense> monthlyExpenses = expenseService.listByMonth(year, month, request, expenseRepository);
-        MonthlyReportDto report = helper.getMonthlyReport(monthlyIncome, monthlyExpenses);
-        return ResponseEntity.ok(report);
+        List<Income> monthlyIncome =
+                incomeService.listEntriesFromMonth(year, month, request, incomeRepository);
+        List<Expense> monthlyExpenses =
+                expenseService.listEntriesFromMonth(year, month, request, expenseRepository);
+        MonthlyReportDto monthlyReport = helper.getMonthlyReport(monthlyIncome, monthlyExpenses);
+        return ResponseEntity.ok(monthlyReport);
     }
 
 

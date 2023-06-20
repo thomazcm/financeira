@@ -16,10 +16,5 @@ public class ExpenseForm extends EntryForm {
         expense.setCategory(category == null ? ExpenseCategory.OUTRAS : category);
         return expense;
     }
-    
-    @Override
-    public UpdateObject toUpdateObject() {
-        return new UpdateObject(this.getName(), this.getValue(), this.getDate(), this.getCategory());
-    }
 
 }

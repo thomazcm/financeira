@@ -35,8 +35,4 @@ public class EntryForm {
         return LocalDate.of(year, month, day);
     }
     
-    public UpdateObject toUpdateObject() {
-        return new UpdateObject(this.getName(), this.getValue(), this.getDate());
-    }
-
 }

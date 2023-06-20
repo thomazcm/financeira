@@ -19,16 +19,18 @@ public class ReportHelper {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal expenseSum = monthlyExpense.stream().map(expense -> expense.getValue())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal monthlyBalance = incomeSum.subtract(expenseSum);
 
-        return new MonthlyReportDto(incomeSum, expenseSum, getCategoryExpenses(monthlyExpense));
+        return new MonthlyReportDto(incomeSum, expenseSum, monthlyBalance,
+                getCategoryExpenses(monthlyExpense));
     }
-    
+
     private EnumMap<ExpenseCategory, BigDecimal> getCategoryExpenses(List<Expense> expenseList) {
-        
+
         var categoryExpenses = new EnumMap<ExpenseCategory, BigDecimal>(ExpenseCategory.class);
-        
+
         expenseList.forEach((expense -> categoryExpenses.compute(expense.getCategory(),
-                (category, categoryValue) -> categoryValue == null ? expense.getValue() 
+                (category, categoryValue) -> categoryValue == null ? expense.getValue()
                         : categoryValue.add(expense.getValue()))));
         return categoryExpenses;
     }
