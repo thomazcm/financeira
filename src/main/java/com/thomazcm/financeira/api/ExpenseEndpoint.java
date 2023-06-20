@@ -45,6 +45,14 @@ public class ExpenseEndpoint {
         return ResponseEntity.ok(ExpenseDto.toList(expenseList));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ExpenseDto> findExpenseFromId(HttpServletRequest request,
+            @PathVariable int id) {
+        var expense = service.findById(id, request, repository);
+        return expense == null ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(new ExpenseDto(expense));
+    }
+
     @GetMapping("/{year}/{month}")
     public ResponseEntity<List<ExpenseDto>> listExpenseByMonth(HttpServletRequest request,
             @PathVariable int year, @PathVariable int month) {
