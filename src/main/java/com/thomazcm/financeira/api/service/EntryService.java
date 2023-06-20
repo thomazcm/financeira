@@ -1,6 +1,6 @@
 package com.thomazcm.financeira.api.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -75,8 +75,8 @@ public class EntryService<T extends Entry> {
     public List<T> listEntriesFromMonth(int year, int month, HttpServletRequest request,
             EntryRepository<T> repository) {
         Long userId = helper.getUserIdFromRequest(request);
-        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
-        LocalDateTime endDate = startDate.plusMonths(1);
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1);
         return repository.findByUser_IdAndDateBetween(userId, startDate, endDate);
     }
 }

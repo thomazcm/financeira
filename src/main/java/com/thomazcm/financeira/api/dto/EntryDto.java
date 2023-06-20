@@ -4,6 +4,7 @@ import com.thomazcm.financeira.model.Entry;
 
 public class EntryDto {
 
+    private Long id;
     private String name;
     private Double value;
     private int year;
@@ -12,11 +13,16 @@ public class EntryDto {
 
 
     public EntryDto(Entry entry) {
+        this.id = entry.getId();
         this.name = entry.getName();
         this.value = entry.getValue().doubleValue();
         this.day = entry.getDate().getDayOfMonth();
         this.month = entry.getDate().getMonthValue();
         this.year = entry.getDate().getYear();
+    }
+    
+    public Long getId() {
+        return this.id;
     }
 
     public String getName() {
