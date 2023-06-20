@@ -13,6 +13,7 @@ public interface EntryRepository<T extends Entry> extends JpaRepository<T, Long>
     Optional<T> findByIdAndUserId(Long id, Long userId);
 
     List<T> findByUser_IdAndDateBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate);
-
+    
+    List<T> findByUser_IdAndName(Long userId, String name);
 
 }

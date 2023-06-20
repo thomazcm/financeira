@@ -31,6 +31,11 @@ public class EntryService<T extends Entry> {
         return repository.findByUser_Id(userId);
     }
 
+    public List<T> findByName(String name, HttpServletRequest request, EntryRepository<T> repository) {
+        Long userId = helper.getUserIdFromRequest(request);
+        return repository.findByUser_IdAndName(userId, name);
+    }
+
     public T saveEntry(T entry, HttpServletRequest request, EntryRepository<T> repository) {
         User user = helper.getUserFromRequest(request);
         user.addEntry(entry);
@@ -45,8 +50,9 @@ public class EntryService<T extends Entry> {
     }
 
     public boolean deleteById(int id, HttpServletRequest request, EntryRepository<T> repository) {
-        if (repository.existsById(Long.valueOf(id))) {
-            repository.deleteById(Integer.toUnsignedLong(id));
+        Long entryId = Long.valueOf(id);
+        if (repository.existsById(entryId)) {
+            repository.deleteById(entryId);
             return true;
         } else {
             return false;

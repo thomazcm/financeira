@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.thomazcm.financeira.api.dto.IncomeDto;
 import com.thomazcm.financeira.api.form.IncomeForm;
-import com.thomazcm.financeira.api.form.UpdateObject;
 import com.thomazcm.financeira.api.service.EntryHelper;
 import com.thomazcm.financeira.api.service.EntryService;
 import com.thomazcm.financeira.model.Income;
@@ -36,9 +36,11 @@ public class IncomeEndpoint {
     }
 
     @GetMapping
-    public ResponseEntity<List<IncomeDto>> listAllIncome(HttpServletRequest request) {
+    public ResponseEntity<List<IncomeDto>> listIncome(HttpServletRequest request,
+            @RequestParam(required = false) String name) {
 
-        var incomeList = service.findAll(request, repository);
+        var incomeList = name == null ? service.findAll(request, repository)
+                : service.findByName(name, request, repository);
         return ResponseEntity.ok(IncomeDto.toList(incomeList));
     }
 
@@ -55,9 +57,9 @@ public class IncomeEndpoint {
     @GetMapping("/{year}/{month}")
     public ResponseEntity<List<IncomeDto>> listIncomeByMonth(HttpServletRequest request,
             @PathVariable int year, @PathVariable int month) {
-        List<Income> incomeFromMonthList = service.listByMonth(year, month, request, repository);
+        List<Income> allIncomeFromMonth = service.listByMonth(year, month, request, repository);
 
-        return ResponseEntity.ok(IncomeDto.toList(incomeFromMonthList));
+        return ResponseEntity.ok(IncomeDto.toList(allIncomeFromMonth));
     }
 
     @PostMapping
@@ -80,7 +82,7 @@ public class IncomeEndpoint {
         if (service.updateEntry(income, form.toUpdateObject(), repository)) {
             return ResponseEntity.ok(new IncomeDto(income));
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
